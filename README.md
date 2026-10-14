@@ -1,6 +1,7 @@
 # IWRL6432WMOD — KiCad symbol & footprint
 
 ![IWRL6432WMOD in KiCad 3D viewer — top view and perspective (TI 3D model)](images/hero.png)
+<sub>3D model source: official STEP model by **Texas Instruments** — <a href="https://www.ti.com/lit/zip/SWRM078">SWRM078</a> (<code>IWRL6432WMOD_3D.step</code>), © Texas Instruments; rendered in KiCad 10 with this footprint. The model is not included in this repository.</sub>
 
 KiCad library for the Texas Instruments **IWRL6432WMOD**. It is a 60 GHz mmWave radar module for motion and presence detection, in a 30-pin QFM / LGA package (MBB0030A).
 
