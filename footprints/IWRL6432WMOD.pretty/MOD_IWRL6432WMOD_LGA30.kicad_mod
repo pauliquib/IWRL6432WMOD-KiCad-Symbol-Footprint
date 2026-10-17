@@ -401,4 +401,15 @@
 			(xyz -0 -0 90)
 		)
 	)
+	(model "${IWRL6432WMOD_DIR}/3d/IWRL6432WMOD_antennas.step"
+		(offset
+			(xyz -180 200 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz -0 -0 90)
+		)
+	)
 )
