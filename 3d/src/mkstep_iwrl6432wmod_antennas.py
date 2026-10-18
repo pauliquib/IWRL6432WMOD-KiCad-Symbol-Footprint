@@ -54,6 +54,10 @@ C_CU = (0.76, 0.50, 0.36)          # bare copper as on the TI photo (sRGB, tuned
 C_LAM = (0.25, 0.26, 0.25)         # RF laminate seen through the etched windows / CPW gaps
 C_PAD_RING = (0.45, 0.26, 0.20)    # darker copper ring of the round pad in the TX2 corner
 C_PAD = (0.78, 0.53, 0.38)
+C_MASK = (0.14, 0.22, 0.08)        # dark green solder mask over the TI model's light-green PCB (matches a KiCad board)
+T_MASK = 0.01                      # mask thickness on top of the module PCB
+SKIN = 0.01                        # mask skin around the module PCB edges (TI PCB: x 192.40..207.90, y 164.46..195.46, z 0..1.6)
+MOD_U, MOD_V = 31.0, 15.5          # module PCB size in the photo frame (u along 31 mm, v along 15.5 mm)
 
 
 def arc3(p0, p1, p2, n=40):
@@ -111,7 +115,15 @@ laminate = area.difference(copper)
 
 pad_ring = Point(28.43, 12.83).buffer(1.55, quad_segs=24)
 pad = Point(28.43, 12.83).buffer(0.53, quad_segs=16)
+pad_ring_outer = pad_ring
 pad_ring = pad_ring.difference(pad)
+
+# solder mask on the rest of the module top: everything except the exposed antenna area, the shield can footprint and
+# the round pad; the can covers its own footprint (narrow strips next to the can stay masked)
+CAN_FP = sbox(0.57, 4.49, 25.47, 14.84)   # real can outline in the TI model (x 196.89..207.24, y 165.03..189.93)
+mask = sbox(0, 0, MOD_U, MOD_V).difference(area).difference(CAN_FP).difference(pad_ring_outer)
+# thin skin over the four PCB edges (the TI model's edges are light green as well)
+skin = sbox(-SKIN, -SKIN, MOD_U + SKIN, MOD_V + SKIN).difference(sbox(0, 0, MOD_U, MOD_V))
 
 
 # ------------------------------------------------------------------ shapely (u, v) -> OCC solids in model coordinates
@@ -131,7 +143,14 @@ def wire(coords):
     return mp.Wire()
 
 
-def prism(p, t):
+def prism(p, t, z0=None):
+    if z0 is not None:
+        global Z0
+        zs, Z0 = Z0, z0
+        try:
+            return prism(p, t)
+        finally:
+            Z0 = zs
     mf = BRepBuilderAPI_MakeFace(wire(p.exterior.coords), True)
     for r in p.interiors: mf.Add(wire(r.coords))
     return BRepPrimAPI_MakePrism(mf.Face(), gp_Vec(0, 0, t)).Shape()
@@ -145,7 +164,9 @@ def bbox(s):
 parts = ([(prism(p, T_CU), C_CU, 'Antenna copper') for p in polys(copper)] +
          [(prism(p, T_DIEL), C_LAM, 'Antenna laminate') for p in polys(laminate)] +
          [(prism(p, 0.02), C_PAD_RING, 'Pad ring') for p in polys(pad_ring)] +
-         [(prism(p, T_CU), C_PAD, 'Pad') for p in polys(pad)])
+         [(prism(p, T_CU), C_PAD, 'Pad') for p in polys(pad)] +
+         [(prism(p, T_MASK), C_MASK, 'Solder mask') for p in polys(mask)] +
+         [(prism(p, Z0 + T_MASK, 0.0), C_MASK, 'Solder mask edge') for p in polys(skin)])
 
 # ------------------------------------------------------------------ write STEP with colours
 doc = TDocStd_Document(TCollection_ExtendedString("XmlOcaf"))

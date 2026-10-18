@@ -63,7 +63,7 @@ All 30 pins follow the datasheet (SWRS350, Table 5-1):
 
 - The STEP model is published by Texas Instruments as [SWRM078](https://www.ti.com/lit/zip/SWRM078). It is not redistributed here.
 - Size 15.5 × 31.0 × 3.76 mm; the datasheet gives a maximum height of 3.8 mm.
-- The TI model shows the module PCB as a plain green board: the antenna area is not modelled.
+- The TI model shows the module PCB as a plain light-green board: the antenna area is not modelled.
 
 ### Antenna overlay (this repository)
 
@@ -79,6 +79,9 @@ All 30 pins follow the datasheet (SWRS350, Table 5-1):
   - TX1 → TX2: 3λ/2 = 7.5 mm in azimuth and λ/2 = 2.5 mm in elevation.
   - The 2 TX × 3 RX MIMO combinations give a virtual array of 2 rows × 6 elements (azimuth: 6 × λ/2, elevation: 2 rows λ/2 apart). This gives the 19° azimuth angular resolution in the datasheet and lets the module measure elevation as well as azimuth (3D detection).
 - **Also modelled:** the round test pad (Ø 3.1 mm copper ring, Ø 1.05 mm exposed pad) in the corner next to TX2.
+- **Solder mask:** the rest of the module top (around the antenna area, the round pad and the shield can) and the four
+  PCB edges get a dark green solder-mask skin (0.01 mm). It covers the light green of the TI model, so the module looks
+  like a normal dark-green PCB next to the host board. The colour is set by `C_MASK` in the script.
 - **Coordinates:** the overlay uses the TI model's coordinate system (module top at z = 1.6 mm), so it shares the offset and rotation of the TI model in the footprint. Height above the module PCB is 0.035 mm, so the module height (3.76 mm) does not change.
 
 Accuracy and intended use:
